@@ -4,6 +4,7 @@
  */
 
 import app from './app';
+import { connectDB } from './db';
 
 // ─────────────────────────────────────────────
 // Configuration
@@ -22,6 +23,10 @@ const PORT: number = Number(process.env.PORT) || 5000;
 /**
  * Starts the Express server and listens for incoming connections.
  */
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
+(async () => {
+  await connectDB(); // Ensure DB is connected first
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  });
+})();
