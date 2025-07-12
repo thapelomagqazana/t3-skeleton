@@ -109,7 +109,12 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
-    "outDir": "./dist",
-    "rootDir": "./src"
-  }
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
 }

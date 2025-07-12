@@ -12,10 +12,12 @@ import { z } from 'zod';
  * - password: must be at least 6 characters
  */
 export const SignUpSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email'),
+  name: z.string().min(1, 'Name is required').max(50).trim(),
+  email: z.string().toLowerCase().trim().email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+})
+.strict(); // If Zod is configured with `.strict()`, extra unknown fields will throw an error
+
 
 /**
  * Schema for validating user signin data.

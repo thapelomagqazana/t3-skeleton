@@ -6,6 +6,10 @@
 import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { applySecurityMiddleware } from './middleware/security';
+import v1AuthRoutes from './routes/v1/auth.routes';
+import v1UserRoutes from './routes/v1/user.routes';
+import { globalErrorHandler } from './middleware/errorHandler';
+import { AppError } from './utils/AppError';
 
 // Load environment variables from .env file into process.env
 dotenv.config();
@@ -21,9 +25,7 @@ applySecurityMiddleware(app);
 // ─────────────────────────────────────────────
 // Core Middleware
 // ─────────────────────────────────────────────
-
-// Automatically parse incoming JSON payloads
-app.use(express.json());
+app.use(express.json()); // Automatically parse incoming JSON payloads
 
 // ─────────────────────────────────────────────
 // Routes
@@ -40,5 +42,20 @@ app.get('/', (_req: Request, res: Response) => {
   });
 });
 
-// Export the configured Express app
+// API routes (v1)
+app.use('/api/v1/auth', v1AuthRoutes);
+app.use('/api/v1/users', v1UserRoutes);
+
+// ─────────────────────────────────────────────
+// Catch-All 404 Route (FIXED)
+// ─────────────────────────────────────────────
+app.use((_req, _res, next) => {
+  next(new AppError('Route not found', 404));
+});
+
+// ─────────────────────────────────────────────
+// Global Error Handler
+// ─────────────────────────────────────────────
+app.use(globalErrorHandler);
+
 export default app;
