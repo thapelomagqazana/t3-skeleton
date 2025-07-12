@@ -1,4 +1,5 @@
-import js from '@eslint/js';
+import js from '@eslint/js'; // CommonJS default export (no named exports)
+
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
@@ -11,10 +12,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
-  // Base JS rules
-  js.configs.recommended,
+  // ✅ Base JavaScript rules
+  js.configs.recommended, // <-- ✅ this works
 
-  // Backend (Node + TypeScript)
+  // ✅ Backend (Node.js + TypeScript)
   {
     files: ['backend/**/*.ts'],
     languageOptions: {
@@ -36,7 +37,7 @@ export default [
     },
   },
 
-  // Frontend (React + Vite + TypeScript)
+  // ✅ Frontend (React + Vite + TypeScript)
   {
     files: ['frontend/**/*.ts', 'frontend/**/*.tsx'],
     languageOptions: {
@@ -69,6 +70,34 @@ export default [
     },
   },
 
-  // Apply Prettier last
+  // ✅ Test files (Jest)
+  {
+    files: ['**/tests/**/*.test.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: [path.join(__dirname, 'backend/tsconfig.json')],
+        tsconfigRootDir: __dirname,
+      },
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        expect: 'readonly',
+        jest: 'readonly',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      jest: (await import('eslint-plugin-jest')).default,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      ...((await import('eslint-plugin-jest')).configs.recommended.rules),
+    },
+  },
+
+  // ✅ Apply Prettier last
   prettier,
 ];
