@@ -4,8 +4,8 @@
  */
 
 import express, { Application, Request, Response } from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
+import { applySecurityMiddleware } from './middleware/security';
 
 // Load environment variables from .env file into process.env
 dotenv.config();
@@ -14,11 +14,13 @@ dotenv.config();
 const app: Application = express();
 
 // ─────────────────────────────────────────────
-// Global Middleware
+// Security Middleware
 // ─────────────────────────────────────────────
+applySecurityMiddleware(app);
 
-// Enable Cross-Origin Resource Sharing
-app.use(cors());
+// ─────────────────────────────────────────────
+// Core Middleware
+// ─────────────────────────────────────────────
 
 // Automatically parse incoming JSON payloads
 app.use(express.json());
