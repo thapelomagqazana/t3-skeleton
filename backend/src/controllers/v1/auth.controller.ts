@@ -9,6 +9,7 @@ import prisma from '../../db';
 import { signToken } from '../../utils/jwt';
 import { SignInInput, SignUpInput } from '../../schemas/user.schema';
 import { AppError } from '../../utils/AppError';
+import { AuthRequest } from '../../middleware/auth.middleware';
 
 /**
  * Handles user signup
@@ -69,7 +70,7 @@ export const signin = async (
 /**
  * Handles user signout (stateless)
  */
-export const signout = async (_req: Request, res: Response) => {
+export const signout = async (_req: AuthRequest, res: Response) => {
   // If using cookies: res.clearCookie('token');
   res.status(200).json({ message: 'Signed out successfully.' });
 };
