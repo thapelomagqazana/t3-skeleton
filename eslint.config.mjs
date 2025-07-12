@@ -1,5 +1,4 @@
-import js from '@eslint/js'; // CommonJS default export (no named exports)
-
+import js from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
@@ -10,12 +9,16 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/** @type {import("eslint").Linter.FlatConfig[]} */
-export default [
-  // ✅ Base JavaScript rules
-  js.configs.recommended, // <-- ✅ this works
+// ✅ Import plugin configs using top-level await
+const jestPlugin = (await import('eslint-plugin-jest')).default;
+const jestConfig = (await import('eslint-plugin-jest')).configs.recommended;
+const tsRecommended = tsPlugin.configs.recommended;
 
-  // ✅ Backend (Node.js + TypeScript)
+export default [
+  // ✅ JavaScript base rules
+  js.configs.recommended,
+
+  // ✅ Backend
   {
     files: ['backend/**/*.ts'],
     languageOptions: {
@@ -33,11 +36,11 @@ export default [
       '@typescript-eslint': tsPlugin,
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
+      ...tsRecommended.rules,
     },
   },
 
-  // ✅ Frontend (React + Vite + TypeScript)
+  // ✅ Frontend
   {
     files: ['frontend/**/*.ts', 'frontend/**/*.tsx'],
     languageOptions: {
@@ -64,13 +67,13 @@ export default [
       },
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
+      ...tsRecommended.rules,
       'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
 
-  // ✅ Test files (Jest)
+  // ✅ Test files
   {
     files: ['**/tests/**/*.test.ts'],
     languageOptions: {
@@ -90,14 +93,14 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
-      jest: (await import('eslint-plugin-jest')).default,
+      jest: jestPlugin,
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
-      ...((await import('eslint-plugin-jest')).configs.recommended.rules),
+      ...tsRecommended.rules,
+      ...jestConfig.rules,
     },
   },
 
-  // ✅ Apply Prettier last
+  // ✅ Prettier config
   prettier,
 ];

@@ -27,3 +27,77 @@ export const cornerUsers = {
   TC304: { name: "Hacker", email: "' OR 1=1--", password: "hackpass" },
   TC305: { name: "<script>alert(1)</script>", email: "safe@example.com", password: "secure123" },
 };
+
+export const signinValid = {
+  TC001: {
+    email: 'existing@example.com',
+    password: 'secret123',
+  },
+  TC002: {
+    email: 'existing@example.com'.toUpperCase(),
+    password: 'secret123',
+  },
+};
+
+export const signinInvalid = {
+  TC101: {
+    password: 'secret123', // missing email
+  },
+  TC102: {
+    email: 'john@example.com', // missing password
+  },
+  TC103: {
+    email: 'not-an-email',
+    password: 'secret123',
+  },
+  TC104: {
+    email: 'john@example.com',
+    password: 'wrongpass',
+  },
+  TC105: {
+    email: 'ghost@example.com',
+    password: 'pass1234',
+  },
+};
+
+export const signinEdge = {
+  TC201: {
+    email: 'john@example.com',
+    password: ' secret123 ',
+  },
+  TC202: {
+    email: ' existing@example.com ',
+    password: 'secret123',
+  },
+  TC203: {
+    email: 'john@example.com',
+    password: 'a'.repeat(256),
+  },
+  TC204: {
+    email: 'john@example.com',
+    password: 'P@ssw0rd!#', // Must match seed if used
+  },
+};
+
+export const signinCorner = {
+  TC301: {},
+  TC302: {
+    email: null,
+    password: null,
+  },
+  TC303: {
+    email: 'existing@example.com',
+    password: 'secret123',
+    role: 'admin',
+  },
+  TC304: {
+    email: "' OR 1=1--",
+    password: 'anything',
+  },
+  TC305: {
+    email: 'john@example.com',
+    password: '<script>',
+  },
+};
+
+

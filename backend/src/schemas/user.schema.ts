@@ -25,9 +25,10 @@ export const SignUpSchema = z.object({
  * - password: must be at least 6 characters
  */
 export const SignInSchema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.string().toLowerCase().trim().email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+})
+.strict(); // If Zod is configured with `.strict()`, extra unknown fields will throw an error
 
 // Optional: Export schema types for strong typing
 export type SignUpInput = z.infer<typeof SignUpSchema>;

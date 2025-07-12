@@ -2,10 +2,15 @@ import request from 'supertest';
 import app from '../../src/app';
 import { validUsers, invalidUsers, edgeUsers, cornerUsers } from '../helpers/user.helper';
 import { clearTestUsers, seedUser } from '../helpers/db.helper';
+import prisma from '../../src/db';
 
 describe('POST /api/v1/auth/signup', () => {
   beforeEach(async () => {
     await clearTestUsers();
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
   });
 
   it('TC001 – ✅ Valid signup', async () => {
@@ -82,7 +87,6 @@ describe('POST /api/v1/auth/signup', () => {
 
   it('TC204 – ⚠️ Leading/trailing spaces in email or name', async () => {
     const res = await request(app).post('/api/v1/auth/signup').send(edgeUsers.TC204);
-    console.log(res.body);
     expect(res.statusCode).toBe(201);
     expect(res.body.user.name).toBe(edgeUsers.TC204.name.trim());
     expect(res.body.user.email).toBe(edgeUsers.TC204.email.trim().toLowerCase());
