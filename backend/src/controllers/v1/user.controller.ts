@@ -8,6 +8,7 @@ import prisma from '../../db';
 import { Role } from '@prisma/client';
 import { AppError } from '../../utils/AppError';
 import { AuthRequest } from '../../middleware/auth.middleware';
+import { UserIdParamSchema } from '../../schemas/userIdParam.schema';
 
 /**
  * GET /api/users
@@ -70,9 +71,32 @@ export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFun
  * GET /api/users/:id
  * Get a user by ID
  */
-export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  const user = await prisma.user.findUnique({ where: { id } });
+export const getUserById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const parseResult = UserIdParamSchema.safeParse(req.params);
+
+  if (!parseResult.success) {
+    return res.status(400).json({
+      error: 'Invalid input',
+      details: parseResult.error.flatten(), // ← Preferred for clean responses
+    });
+  }
+
+
+  const requestedUserId = parseResult.data.id;
+  const requester = req.user;
+
+  if (!requester) {
+    return next(new AppError('Unauthorized', 401));
+  }
+
+  const isSelf = requester.userId === requestedUserId;
+  const isAdmin = requester.role === Role.ADMIN;
+
+  if (!isSelf && !isAdmin) {
+    return next(new AppError('Forbidden – You cannot access this user’s information', 403));
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: requestedUserId } });
 
   if (!user) return next(new AppError('User not found', 404));
 

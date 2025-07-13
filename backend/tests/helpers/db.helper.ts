@@ -18,6 +18,7 @@ const TEST_USER_EMAILS = [
   'safe@example.com',
   'admin@example.com', 
   'user@example.com',
+  "otheruser@example.com",
 ];
 
 export const clearTestUsers = async () => {
@@ -57,12 +58,12 @@ export const seedAdminUser = async () => {
   });
 };
 
-export const seedNormalUser = async () => {
+export const seedNormalUser = async (email: string = 'user@example.com', password: string = 'testpass123') => {
   return await prisma.user.create({
     data: {
       name: 'Normal User',
-      email: 'user@example.com',
-      password: 'hashedpass',
+      email,
+      password,
       role: Role.USER,
       isActive: true,
     },
