@@ -10,11 +10,12 @@ import {
   updateUser,
   deleteUser,
 } from '../../controllers/v1/user.controller';
+import { authenticateJWT } from '../../middleware/auth.middleware';
 
 const router = Router();
 
 // /api/v1/users
-router.get('/', getAllUsers);
+router.get('/', authenticateJWT, getAllUsers);
 router.get('/:id', getUserById);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);

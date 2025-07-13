@@ -7,24 +7,34 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 
 export interface AuthRequest extends Request {
-  user?: { userId: string };
+  user?: {
+    userId: string;
+    role: string;
+  };
 }
 
 /**
  * Middleware to protect routes using JWT.
  */
 export function authenticateJWT(req: AuthRequest, res: Response, next: NextFunction) {
-  const token = req.headers?.authorization?.split(' ')[1];
+  const authHeader = req.headers?.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized - Token missing or invalid scheme' });
+  }
+
+  const token = authHeader.replace('Bearer', '').trim();
 
   if (!token) {
-    return res.status(401).json({ error: 'Unauthorized - Token missing' });
+    return res.status(401).json({ error: 'Unauthorized - Token empty' });
   }
 
   try {
-    const decoded = verifyToken<{ userId: string }>(token);
-    req.user = { userId: decoded.userId };
+    const decoded = verifyToken<{ userId: string, role: string }>(token);
+    req.user = decoded;
     next();
   } catch {
     return res.status(403).json({ error: 'Forbidden - Invalid or expired token' });
   }
 }
+

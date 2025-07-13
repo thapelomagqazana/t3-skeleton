@@ -5,15 +5,65 @@
 
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../../db';
+import { Role } from '@prisma/client';
 import { AppError } from '../../utils/AppError';
+import { AuthRequest } from '../../middleware/auth.middleware';
 
 /**
  * GET /api/users
  * Get all users
  */
-export const getAllUsers = async (_req: Request, res: Response) => {
-  const users = await prisma.user.findMany();
-  res.json(users);
+export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    // Check for role-based access
+    if (req.user?.role !== Role.ADMIN) {
+      throw new AppError('Forbidden: Admins only', 403);
+    }
+
+    // Extract and validate query params
+    const { page = 1, limit = 10, role, active, search } = req.query;
+
+    const pageNumber = parseInt(page as string, 10);
+    const limitNumber = parseInt(limit as string, 10);
+
+    if (isNaN(pageNumber) || isNaN(limitNumber) || pageNumber < 1 || limitNumber < 1) {
+      throw new AppError('Invalid pagination input', 400);
+    }
+
+    const where: any = {};
+
+    if (role) {
+      const normalizedRole = role.toString().toUpperCase();
+      if (!Object.values(Role).includes(normalizedRole as Role)) {
+        throw new AppError('Invalid role filter', 400);
+      }
+      where.role = normalizedRole as Role;
+    }
+
+    if (typeof active !== 'undefined') {
+      if (active !== 'true' && active !== 'false') {
+        throw new AppError('Invalid active filter', 400);
+      }
+      where.isActive = active === 'true';
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const users = await prisma.user.findMany({
+      where,
+      skip: (pageNumber - 1) * limitNumber,
+      take: limitNumber,
+    });
+
+    res.status(200).json({ users });
+  } catch (err) {
+    next(err);
+  }
 };
 
 /**
@@ -26,7 +76,7 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 
   if (!user) return next(new AppError('User not found', 404));
 
-  res.json(user);
+  res.json({ user });
 };
 
 /**
@@ -43,7 +93,7 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
       data: { name, email },
     });
 
-    res.json(user);
+    res.json({ user });
   } catch {
     next(new AppError('User update failed. Possibly email already taken.', 400));
   }

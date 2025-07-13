@@ -1,5 +1,6 @@
 import prisma from '../../src/db';
 import bcrypt from 'bcryptjs';
+import { Role } from '@prisma/client';
 
 const TEST_USER_EMAILS = [
   'john@example.com',
@@ -15,6 +16,8 @@ const TEST_USER_EMAILS = [
   'long@example.com',
   "' OR 1=1--",
   'safe@example.com',
+  'admin@example.com', 
+  'user@example.com',
 ];
 
 export const clearTestUsers = async () => {
@@ -38,6 +41,30 @@ export const seedUser = async (email = 'existing@example.com', password = 'secre
       name: 'Existing User',
       email,
       password: hashedPassword,
+    },
+  });
+};
+
+export const seedAdminUser = async () => {
+  return await prisma.user.create({
+    data: {
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: 'hashedpass',
+      role: Role.ADMIN,
+      isActive: true,
+    },
+  });
+};
+
+export const seedNormalUser = async () => {
+  return await prisma.user.create({
+    data: {
+      name: 'Normal User',
+      email: 'user@example.com',
+      password: 'hashedpass',
+      role: Role.USER,
+      isActive: true,
     },
   });
 };

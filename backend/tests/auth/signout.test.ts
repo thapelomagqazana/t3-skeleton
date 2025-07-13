@@ -94,7 +94,7 @@ describe('POST /api/v1/auth/signout', () => {
     const res = await request(app)
       .post('/api/v1/auth/signout')
       .set('Authorization', `Bearer  ${validToken} `);
-    expect(res.statusCode).toBe(401); // Should fail if not trimmed
+    expect(res.statusCode).toBe(200);
   });
 
   it('TC202 – JWT token with non-ASCII characters', async () => {
@@ -138,7 +138,7 @@ describe('POST /api/v1/auth/signout', () => {
     const res = await request(app)
       .post('/api/v1/auth/signout')
       .set('Authorization', 'Basic abc123');
-    expect(res.statusCode).toBe(403);
+    expect(res.statusCode).toBe(401);
   });
 
   it('TC304 – Oversized JWT token', async () => {

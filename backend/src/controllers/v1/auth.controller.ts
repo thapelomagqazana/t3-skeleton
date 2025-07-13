@@ -30,7 +30,7 @@ export const signup = async (
       data: { name, email, password: hashed },
     });
 
-    const token = signToken({ userId: user.id });
+    const token = signToken({ userId: user.id, role: user.role },);
     res.status(201).json({
       token,
       user: { id: user.id, name: user.name, email: user.email },
@@ -57,7 +57,7 @@ export const signin = async (
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new AppError('Invalid credentials.', 401));
 
-    const token = signToken({ userId: user.id });
+    const token = signToken({ userId: user.id, role: user.role },);
     res.status(200).json({
       token,
       user: { id: user.id, name: user.name, email: user.email },

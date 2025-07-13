@@ -14,19 +14,19 @@ datasource db {
 }
 
 model User {
-  // Unique identifier for each user, using UUIDs to avoid predictability (vs. auto-incremented IDs)
   id        String   @id @default(uuid())
-
-  // Full name of the user, required for profile and personalization
   name      String
-
-  // Email is unique per user and used as a login identifier
   email     String   @unique
-
-  // Hashed password (never store plain text passwords); used for authentication
   password  String
 
-  // Timestamp for account creation; helps with auditing and sorting
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+
+enum Role {
+  ADMIN
+  USER
+}
+
 
