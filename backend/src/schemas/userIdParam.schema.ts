@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Ensures the ID is a valid UUID (v4 or general)
  */
 export const UserIdParamSchema = z.object({
-  id: z.string().trim().uuid('Invalid user ID format'),
+  id: z.string().trim().uuid('Invalid user ID format').toLowerCase(),
 });
 
 export type UserIdParamInput = z.infer<typeof UserIdParamSchema>;

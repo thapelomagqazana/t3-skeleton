@@ -1,7 +1,8 @@
 import request from 'supertest';
 import app from '../../src/app';
-import { clearTestUsers, seedUser, seedAdminUser, seedNormalUser } from '../helpers/db.helper';
+import { clearTestUsers, seedAdminUser, seedNormalUser } from '../helpers/db.helper';
 import { generateToken } from '../helpers/token.helper';
+
 
 describe('GET /api/v1/users/:id', () => {
   let adminUser: any;

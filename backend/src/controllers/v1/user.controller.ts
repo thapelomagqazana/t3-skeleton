@@ -107,14 +107,31 @@ export const getUserById = async (req: AuthRequest, res: Response, next: NextFun
  * PUT /api/users/:id
  * Update user
  */
-export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  const { name, email } = req.body;
+export const updateUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const parseResult = UserIdParamSchema.safeParse(req.params);
+
+  if (!parseResult.success) {
+    return res.status(400).json({
+      error: 'Invalid input',
+      details: parseResult.error.flatten(), // ← Preferred for clean responses
+    });
+  }
+
+  const requestedUserId = parseResult.data.id;
+  const { name, email, password, isActive, role } = req.body;
+
+  const isAdmin = req.user?.role === Role.ADMIN;
+  const isSelf = req.user?.userId === requestedUserId;
+
+  if (!isAdmin && !isSelf) {
+    return next(new AppError('Forbidden – You cannot access this user’s information', 403));
+  }
+
 
   try {
     const user = await prisma.user.update({
-      where: { id },
-      data: { name, email },
+      where: { id: requestedUserId },
+      data: { name, email, password, isActive, role },
     });
 
     res.json({ user });

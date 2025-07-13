@@ -11,13 +11,15 @@ import {
   deleteUser,
 } from '../../controllers/v1/user.controller';
 import { authenticateJWT } from '../../middleware/auth.middleware';
+import { UpdateUserSchema } from '../../schemas/user.schema';
+import { validate } from '../../middleware/validate';
 
 const router = Router();
 
 // /api/v1/users
 router.get('/', authenticateJWT, getAllUsers);
 router.get('/:id', authenticateJWT, getUserById);
-router.put('/:id', updateUser);
+router.put('/:id', authenticateJWT, validate(UpdateUserSchema), updateUser);
 router.delete('/:id', deleteUser);
 
 export default router;

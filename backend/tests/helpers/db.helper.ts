@@ -19,6 +19,7 @@ const TEST_USER_EMAILS = [
   'admin@example.com', 
   'user@example.com',
   "otheruser@example.com",
+  'multifield@example.com',
 ];
 
 export const clearTestUsers = async () => {
