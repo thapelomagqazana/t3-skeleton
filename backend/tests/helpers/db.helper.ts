@@ -20,6 +20,10 @@ const TEST_USER_EMAILS = [
   'user@example.com',
   "otheruser@example.com",
   'multifield@example.com',
+  'thirduser@example.com',
+  'deleted@example.com',
+  'soft@example.com',
+  'hard@example.com',
 ];
 
 export const clearTestUsers = async () => {
@@ -70,3 +74,17 @@ export const seedNormalUser = async (email: string = 'user@example.com', passwor
     },
   });
 };
+
+/**
+ * Marks a user as soft-deleted (e.g., sets `active` to false or `isDeleted` to true).
+ * @param userId UUID of the user to soft-delete
+ * @returns Updated user object
+ */
+export async function softDeleteUserById(userId: string) {
+  return await prisma.user.update({
+    where: { id: userId },
+    data: {
+      isActive: false, // or active: false, depending on your schema
+    },
+  });
+}

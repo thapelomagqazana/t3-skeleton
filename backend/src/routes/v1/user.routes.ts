@@ -20,6 +20,6 @@ const router = Router();
 router.get('/', authenticateJWT, getAllUsers);
 router.get('/:id', authenticateJWT, getUserById);
 router.put('/:id', authenticateJWT, validate(UpdateUserSchema), updateUser);
-router.delete('/:id', deleteUser);
+router.delete('/:id', authenticateJWT, deleteUser);
 
 export default router;

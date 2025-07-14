@@ -144,12 +144,36 @@ export const updateUser = async (req: AuthRequest, res: Response, next: NextFunc
  * DELETE /api/users/:id
  * Delete a user
  */
-export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
+export const deleteUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const parseResult = UserIdParamSchema.safeParse(req.params);
+
+  if (!parseResult.success) {
+    return res.status(400).json({
+      error: 'Invalid input',
+      details: parseResult.error.flatten(), // ← Preferred for clean responses
+    });
+  }
+
+  const requestedUserId = parseResult.data.id;
+
+  const isAdmin = req.user?.role === Role.ADMIN;
+  const isSelf = req.user?.userId === requestedUserId;
+
+  if (!isAdmin && !isSelf) {
+    return next(new AppError('Forbidden – You cannot access this user’s information', 403));
+  }
 
   try {
-    await prisma.user.delete({ where: { id } });
-    res.status(204).send();
+    const user = await prisma.user.findUnique({ where: { id: requestedUserId } });
+
+    if (!user) return next(new AppError('User not found', 404));
+    if (!user.isActive) return next(new AppError('User already deleted', 410));
+ 
+    await prisma.user.update({
+      where: { id: requestedUserId },
+      data: { isActive: false},
+    });
+    return res.status(200).json({ message: 'User successfully deleted' });
   } catch {
     next(new AppError('User deletion failed', 400));
   }
