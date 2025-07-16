@@ -50,39 +50,42 @@ export default function SignIn() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label>Email</label>
-          <input
+            <label htmlFor="email">Email</label>
+            <input
+            id="email"
             {...register('email')}
             type="email"
             className="w-full border px-3 py-2 rounded"
-          />
-          {errors.email && (
+            />
+            {errors.email && (
             <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
-          )}
+            )}
         </div>
 
         <div>
-          <label>Password</label>
-          <input
+            <label htmlFor="password">Password</label>
+            <input
+            id="password"
             {...register('password')}
             type="password"
             className="w-full border px-3 py-2 rounded"
-          />
-          {errors.password && (
+            />
+            {errors.password && (
             <p className="text-red-600 text-sm mt-1">{errors.password.message}</p>
-          )}
+            )}
         </div>
 
         <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`w-full py-2 rounded transition text-white ${
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full py-2 rounded transition text-white ${
             isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+            }`}
         >
-          {isSubmitting ? 'Logging in...' : 'Login'}
+            {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
+
     </div>
   );
 }
