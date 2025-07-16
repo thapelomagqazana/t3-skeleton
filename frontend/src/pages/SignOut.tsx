@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { signOut as signOutAPI } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 /**
  * SignOut component clears auth state and notifies the backend.
@@ -13,6 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 export default function SignOut() {
   const [message, setMessage] = useState('Signing you out...');
   const { signout, token } = useAuth();
+  const toastId = 'signout-toast';
 
   /**
    * Triggers signout logic on component mount.
@@ -23,10 +25,15 @@ export default function SignOut() {
         if (token) {
           await signOutAPI(); // Notify backend (optional)
         }
+
         signout(); // Clear context, localStorage, and redirect
-        setMessage('Signed out successfully.');
+        toast.dismiss(toastId); // Prevent duplicate
+        toast.success('Signed out successfully.', { toastId });
+        setMessage('');
       } catch (error) {
         console.error('Signout Error:', error);
+        toast.dismiss(toastId);
+        toast.error('Error during sign-out. Please try again.', { toastId });
         setMessage('Error during sign-out. Please try again.');
       }
     };

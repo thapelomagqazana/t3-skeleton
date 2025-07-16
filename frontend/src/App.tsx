@@ -12,6 +12,8 @@ import Dashboard from './pages/Dashboard';
 import PrivateRoute from './routes/PrivateRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 /**
  * Root App component handling public routes for authentication pages.
@@ -20,6 +22,7 @@ function App() {
   return (
     <>
       <Navbar />
+      <ToastContainer position="top-center" autoClose={3000} />
 
       {/* Routes */}
       <Routes>

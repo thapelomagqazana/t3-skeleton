@@ -7,13 +7,13 @@ import { useState } from 'react';
 import { signIn } from '../api/auth';
 import InputField from '../components/InputField';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 /**
  * SignIn component handles login via email and password.
  */
 export default function SignIn() {
   const [form, setForm] = useState({ email: '', password: '' });
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const { signin } = useAuth();
 
@@ -31,19 +31,19 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
 
     try {
       const response = await signIn(form);
 
       if (response.token && response.user) {
         signin({ token: response.token, user: response.user });
+        toast.success('Signed in successfully');
       } else {
-        setMessage(response.error || 'Invalid credentials. Please try again.');
+        toast.error(response.error || 'Invalid credentials. Please try again.');
       }
     } catch (err) {
       console.error(err);
-      setMessage('An error occurred while signing in. Please try again.');
+      toast.error('An error occurred while signing in');
     } finally {
       setLoading(false);
     }
@@ -78,8 +78,6 @@ export default function SignIn() {
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-
-      {message && <p className="mt-4 text-sm text-red-600 text-center">{message}</p>}
     </div>
   );
 }

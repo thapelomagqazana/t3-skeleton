@@ -7,13 +7,13 @@ import { useState } from 'react';
 import { signUp } from '../api/auth';
 import InputField from '../components/InputField';
 import { useAuth } from '../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 /**
  * SignUp component handles new user registration.
  */
 export default function SignUp() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const { signin } = useAuth();
 
@@ -30,19 +30,19 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
 
     try {
       const res = await signUp(form);
 
       if (res.token && res.user) {
         signin({ token: res.token, user: res.user }); // Set global auth state and redirect
+        toast.success('Account created successfully!');
       } else {
-        setMessage(res.error || 'Signup failed. Please try again.');
+        toast.error(res.error || 'Signup failed. Please try again.');
       }
     } catch (error) {
       console.error(error);
-      setMessage('An unexpected error occurred during signup.');
+      toast.error('An unexpected error occurred during signup.');
     } finally {
       setLoading(false);
     }
@@ -84,8 +84,6 @@ export default function SignUp() {
           {loading ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
-
-      {message && <p className="mt-4 text-sm text-red-600 text-center">{message}</p>}
     </div>
   );
 }
