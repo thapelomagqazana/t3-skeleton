@@ -21,7 +21,7 @@ export default function SignOut() {
     const performSignout = async () => {
       try {
         if (token) {
-          await signOutAPI(token); // Notify backend (optional)
+          await signOutAPI(); // Notify backend (optional)
         }
         signout(); // Clear context, localStorage, and redirect
         setMessage('Signed out successfully.');
