@@ -1,87 +1,88 @@
 /**
  * @file SignUp.tsx
- * @description Sign Up page for user registration.
+ * @description Sign Up page with React Hook Form + Zod validation
  */
 
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { signUp } from '../api/auth';
-import InputField from '../components/InputField';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
 
-/**
- * SignUp component handles new user registration.
- */
+const schema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type SignUpFormData = z.infer<typeof schema>;
+
 export default function SignUp() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
-  const [loading, setLoading] = useState(false);
   const { signin } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(schema),
+  });
 
-  /**
-   * Handles input value changes for controlled form fields.
-   */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  /**
-   * Submits the form data to the backend for registration and stores JWT.
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const onSubmit = async (data: SignUpFormData) => {
     try {
-      const res = await signUp(form);
-
+      const res = await signUp(data);
       if (res.token && res.user) {
-        signin({ token: res.token, user: res.user }); // Set global auth state and redirect
-        toast.success('Account created successfully!');
+        signin({ token: res.token, user: res.user });
+        toast.success('Signed up successfully!');
       } else {
-        toast.error(res.error || 'Signup failed. Please try again.');
+        toast.error(res.error || 'Signup failed.');
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('An unexpected error occurred during signup.');
-    } finally {
-      setLoading(false);
+    } catch {
+      toast.error('An error occurred during signup.');
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label>Name</label>
+          <input
+            {...register('name')}
+            className="w-full border px-3 py-2 rounded"
+          />
+          {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <InputField
-          label="Name"
-          type="text"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-        />
-        <InputField
-          label="Email"
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-        />
-        <InputField
-          label="Password"
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-        />
+        <div>
+          <label>Email</label>
+          <input
+            {...register('email')}
+            type="email"
+            className="w-full border px-3 py-2 rounded"
+          />
+          {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
+        </div>
+
+        <div>
+          <label>Password</label>
+          <input
+            {...register('password')}
+            type="password"
+            className="w-full border px-3 py-2 rounded"
+          />
+          {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+        </div>
+
         <button
           type="submit"
-          disabled={loading}
-          className={`w-full py-2 rounded transition text-white ${
-            loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          disabled={isSubmitting}
+          className={`w-full py-2 rounded text-white ${
+            isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
           }`}
         >
-          {loading ? 'Creating Account...' : 'Create Account'}
+          {isSubmitting ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
     </div>

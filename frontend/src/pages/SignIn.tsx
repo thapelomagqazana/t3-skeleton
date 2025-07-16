@@ -1,39 +1,36 @@
 /**
  * @file SignIn.tsx
- * @description Sign In page for user login.
+ * @description Sign In page for user login using RHF + Zod.
  */
 
-import { useState } from 'react';
-import { signIn } from '../api/auth';
-import InputField from '../components/InputField';
 import { useAuth } from '../hooks/useAuth';
+import { signIn } from '../api/auth';
 import { toast } from 'react-toastify';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-/**
- * SignIn component handles login via email and password.
- */
+const schema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type SignInFormData = z.infer<typeof schema>;
+
 export default function SignIn() {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false);
   const { signin } = useAuth();
 
-  /**
-   * Handles form field updates.
-   */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(schema),
+  });
 
-  /**
-   * Handles form submission.
-   * Calls the backend API and updates auth state on success.
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const onSubmit = async (data: SignInFormData) => {
     try {
-      const response = await signIn(form);
+      const response = await signIn(data);
 
       if (response.token && response.user) {
         signin({ token: response.token, user: response.user });
@@ -41,11 +38,9 @@ export default function SignIn() {
       } else {
         toast.error(response.error || 'Invalid credentials. Please try again.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       toast.error('An error occurred while signing in');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -53,29 +48,39 @@ export default function SignIn() {
     <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <InputField
-          label="Email"
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-        />
-        <InputField
-          label="Password"
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-        />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label>Email</label>
+          <input
+            {...register('email')}
+            type="email"
+            className="w-full border px-3 py-2 rounded"
+          />
+          {errors.email && (
+            <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label>Password</label>
+          <input
+            {...register('password')}
+            type="password"
+            className="w-full border px-3 py-2 rounded"
+          />
+          {errors.password && (
+            <p className="text-red-600 text-sm mt-1">{errors.password.message}</p>
+          )}
+        </div>
+
         <button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className={`w-full py-2 rounded transition text-white ${
-            loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
           }`}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>
