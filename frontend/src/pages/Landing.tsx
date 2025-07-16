@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { APP_NAME } from '../config/constants';
 
 export default function Landing() {
   return (
@@ -11,7 +12,7 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="text-center max-w-2xl">
         <h1 className="text-5xl font-extrabold mb-6 tracking-tight">
-          Welcome to <span className="text-blue-600">T3 Skeleton</span>
+          Welcome to <span className="text-blue-600">{APP_NAME}</span>
         </h1>
         <p className="text-lg text-gray-600 mb-8">
           A secure, modern, and scalable boilerplate built with Express, Prisma, React, Tailwind, and TypeScript.
@@ -33,11 +34,6 @@ export default function Landing() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="mt-16 text-sm text-gray-400">
-        Built with ❤️ by Thapelo Magqazana • {new Date().getFullYear()}
-      </footer>
     </main>
   );
 }

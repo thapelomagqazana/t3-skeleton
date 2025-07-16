@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { signIn } from '../api/auth';
 import InputField from '../components/InputField';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * SignIn component handles login via email and password.
@@ -13,40 +14,72 @@ import InputField from '../components/InputField';
 export default function SignIn() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signin } = useAuth();
 
   /**
-   * Updates form state when input values change.
+   * Handles form field updates.
    */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   /**
-   * Submits login request and stores JWT if successful.
+   * Handles form submission.
+   * Calls the backend API and updates auth state on success.
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await signIn(form);
+    setLoading(true);
+    setMessage('');
 
-    if (res.token) {
-      localStorage.setItem('token', res.token); // Save token to localStorage
-      setMessage('Sign-in successful!');
-    } else {
-      setMessage(res.error || 'Invalid credentials.');
+    try {
+      const response = await signIn(form);
+
+      if (response.token && response.user) {
+        signin({ token: response.token, user: response.user });
+      } else {
+        setMessage(response.error || 'Invalid credentials. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('An error occurred while signing in. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Sign In</h2>
-      <form onSubmit={handleSubmit}>
-        <InputField label="Email" type="email" name="email" value={form.email} onChange={handleChange} />
-        <InputField label="Password" type="password" name="password" value={form.password} onChange={handleChange} />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded mt-4">
-          Login
+    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <InputField
+          label="Email"
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+        />
+        <InputField
+          label="Password"
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-2 rounded transition text-white ${
+            loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+        >
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
+
+      {message && <p className="mt-4 text-sm text-red-600 text-center">{message}</p>}
     </div>
   );
 }
