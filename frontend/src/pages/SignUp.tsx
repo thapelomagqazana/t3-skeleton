@@ -47,32 +47,35 @@ export default function SignUp() {
       <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label>Name</label>
-          <input
+        <label htmlFor="name">Name</label>
+        <input
+            id="name"
             {...register('name')}
             className="w-full border px-3 py-2 rounded"
-          />
-          {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
+        />
+        {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
         </div>
 
         <div>
-          <label>Email</label>
-          <input
+        <label htmlFor="email">Email</label>
+        <input
+            id="email"
             {...register('email')}
             type="email"
             className="w-full border px-3 py-2 rounded"
-          />
-          {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
+        />
+        {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label>Password</label>
-          <input
+        <label htmlFor="password">Password</label>
+        <input
+            id="password"
             {...register('password')}
             type="password"
             className="w-full border px-3 py-2 rounded"
-          />
-          {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+        />
+        {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
         </div>
 
         <button
