@@ -11,6 +11,8 @@ import v1UserRoutes from './routes/v1/user.routes';
 import testRoutes from './routes/test.routes';
 import { globalErrorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
+import { requestLogger, errorLogger } from './middleware/logging';
+import { logger } from './utils/logger';
 
 // Load environment variables from .env file into process.env
 dotenv.config();
@@ -27,6 +29,9 @@ applySecurityMiddleware(app);
 // Core Middleware
 // ─────────────────────────────────────────────
 app.use(express.json()); // Automatically parse incoming JSON payloads
+
+// Log all incoming requests
+app.use(requestLogger);
 
 // ─────────────────────────────────────────────
 // Routes
@@ -60,5 +65,15 @@ app.use((_req, _res, next) => {
 // Global Error Handler
 // ─────────────────────────────────────────────
 app.use(globalErrorHandler);
+
+// Capture & log unhandled server-side errors
+app.use(errorLogger);
+
+// Default fallback error handler for client response
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.status(err.status || 500).json({
+    error: { message: err.message || 'Internal Server Error' },
+  });
+});
 
 export default app;

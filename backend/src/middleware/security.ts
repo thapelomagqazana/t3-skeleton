@@ -25,7 +25,15 @@ export const applySecurityMiddleware = (app: Application) => {
   // ──────────────── CORS ────────────────
   // Allow requests from the frontend origin defined in .env
   const allowedOrigin = process.env.FRONTEND_URL || '*';
-  const maxLimit = process.env.NODE_ENV === 'development' ? 1000 : 100;
+  let maxLimit: number;
+
+  if (process.env.NODE_ENV === 'test') {
+    maxLimit = 500; // Lower limit for test stability
+  } else if (process.env.NODE_ENV === 'development') {
+    maxLimit = 1000; // Higher limit for local dev exploration
+  } else {
+    maxLimit = 100; // Production-safe default
+  } // Production-safe default;
 
   app.use(
     cors({
