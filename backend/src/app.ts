@@ -12,7 +12,7 @@ import testRoutes from './routes/test.routes';
 import { globalErrorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 import { requestLogger, errorLogger } from './middleware/logging';
-import { logger } from './utils/logger';
+import { setupSwaggerDocs } from './docs/swagger';
 
 // Load environment variables from .env file into process.env
 dotenv.config();
@@ -24,6 +24,8 @@ const app: Application = express();
 // Security Middleware
 // ─────────────────────────────────────────────
 applySecurityMiddleware(app);
+
+setupSwaggerDocs(app); // Enable Swagger only in dev
 
 // ─────────────────────────────────────────────
 // Core Middleware

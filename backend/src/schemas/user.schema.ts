@@ -6,6 +6,8 @@
 import { z } from 'zod';
 import { Role } from '@prisma/client';
 
+
+
 /**
  * Schema for validating user signup data.
  * - name: required string
@@ -42,7 +44,88 @@ export const UpdateUserSchema = z.object({
   message: 'At least one field must be provided for update.',
 }).strict();
 
-// Optional: Export schema types for strong typing
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SignUpInput:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *         - password
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: John Doe
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: MySecurePassword123
+ *     SignInInput:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: MySecurePassword123
+ *     User:
+ *       type: object
+ *       required:
+ *         - id
+ *         - name
+ *         - email
+ *         - createdAt
+ *         - updatedAt
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "6f1b0c30-52aa-4d32-a69f-1f7393eaa5b5"
+ *         name:
+ *           type: string
+ *           example: John Doe
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: john@example.com
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2024-01-01T12:00:00Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2024-01-05T14:30:00Z"
+ *     UpdateUserInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: Updated Name
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: updated@example.com
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: NewSecurePassword123
+ *
+ */
+
 export type SignUpInput = z.infer<typeof SignUpSchema>;
 export type SignInInput = z.infer<typeof SignInSchema>;
 export type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
+
