@@ -69,3 +69,10 @@ Cypress.Commands.add('seedTestUser', (options: SeedTestUserOptions = {}) => {
   });
 });
 
+Cypress.Commands.add('loginByUI', () => {
+  cy.visit('/signin');
+  cy.get('input[name="email"]').type('testuser@example.com');
+  cy.get('input[name="password"]').type('password123');
+  cy.get('button[type="submit"]').click();
+});
+

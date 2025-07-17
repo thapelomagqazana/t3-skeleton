@@ -4,7 +4,13 @@ describe('User Sign In Flow', () => {
     cy.seedTestUser();      // Create valid test user
   });
 
-  // ✅ Positive Test Case
+  beforeEach(() => {
+    cy.clearLocalStorage();
+    cy.clearCookies();
+    cy.visit('/'); // Optional: force reload app
+  });
+
+  // Positive Test Case
   it('signs in successfully with valid credentials', () => {
     cy.visit('/signin');
 
@@ -18,7 +24,7 @@ describe('User Sign In Flow', () => {
     cy.window().its('localStorage.token').should('exist');
   });
 
-  // ❌ Negative Test Cases
+  // Negative Test Cases
   it('fails with empty form submission', () => {
     cy.visit('/signin');
     cy.get('button[type="submit"]').click();
@@ -56,7 +62,7 @@ describe('User Sign In Flow', () => {
     cy.contains(/invalid email/i);
   });
 
-  // 🟡 Edge Cases
+  // Edge Cases
   it('signs in with email in uppercase', () => {
     cy.visit('/signin');
     cy.get('input[name="email"]').type('TESTUSER@EXAMPLE.COM');
@@ -81,7 +87,7 @@ describe('User Sign In Flow', () => {
     cy.url().should('include', '/dashboard');
   });
 
-  // 🧪 Corner Cases
+  // Corner Cases
   it.skip('handles email with leading/trailing spaces', () => {
     cy.visit('/signin');
     cy.get('input[name="email"]').type('  testuser@example.com  ');
