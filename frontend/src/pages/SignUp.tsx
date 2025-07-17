@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUp } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -37,9 +38,15 @@ export default function SignUp() {
       } else {
         toast.error(res.error || 'Signup failed.');
       }
-    } catch {
-      toast.error('An error occurred during signup.');
+    } catch (error: unknown) {
+      let backendMessage = 'Something went wrong';
+
+      if (error instanceof AxiosError && error.response?.data?.error?.message) {
+        backendMessage = error.response.data.error.message;
+      }
+      toast.error(backendMessage);
     }
+  
   };
 
   return (

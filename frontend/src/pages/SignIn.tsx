@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AxiosError } from 'axios';
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
@@ -30,7 +31,10 @@ export default function SignIn() {
 
   const onSubmit = async (data: SignInFormData) => {
     try {
-      const response = await signIn(data);
+      const response = await signIn({
+        email: data.email.trim(),
+        password: data.password,
+      });
 
       if (response.token && response.user) {
         signin({ token: response.token, user: response.user });
@@ -38,9 +42,13 @@ export default function SignIn() {
       } else {
         toast.error(response.error || 'Invalid credentials. Please try again.');
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('An error occurred while signing in');
+    } catch (error: unknown) {
+      let backendMessage = 'An error occurred while signing in';
+
+      if (error instanceof AxiosError && error.response?.data?.error?.message) {
+        backendMessage = error.response.data.error.message;
+      }
+      toast.error(backendMessage);
     }
   };
 

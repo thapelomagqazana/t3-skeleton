@@ -3,7 +3,7 @@
  * @description Handles user registration, login, logout
  */
 
-import { Request, Response, NextFunction } from 'express';
+import e, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import prisma from '../../db';
 import { signToken } from '../../utils/jwt';
@@ -22,12 +22,15 @@ export const signup = async (
   try {
     const { name, email, password } = req.body;
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    
+    const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
     if (existing) return next(new AppError('Email already in use.', 409));
 
     const hashed = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
-      data: { name, email, password: hashed },
+      data: { name: trimmedName, email: trimmedEmail, password: hashed },
     });
 
     const token = signToken({ userId: user.id, role: user.role },);
@@ -51,7 +54,7 @@ export const signin = async (
   try {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email: email.trim() } });
     if (!user) return next(new AppError('Invalid credentials.', 401));
 
     const isMatch = await bcrypt.compare(password, user.password);

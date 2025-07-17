@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { applySecurityMiddleware } from './middleware/security';
 import v1AuthRoutes from './routes/v1/auth.routes';
 import v1UserRoutes from './routes/v1/user.routes';
+import testRoutes from './routes/test.routes';
 import { globalErrorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 
@@ -42,7 +43,9 @@ app.get('/', (_req: Request, res: Response) => {
   });
 });
 
-// API routes (v1)
+// API routes
+app.use('/api/v1/test', testRoutes); 
+// (v1)
 app.use('/api/v1/auth', v1AuthRoutes);
 app.use('/api/v1/users', v1UserRoutes);
 

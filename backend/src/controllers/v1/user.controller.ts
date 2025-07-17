@@ -3,7 +3,7 @@
  * @description Contains controller logic for User CRUD operations.
  */
 
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import prisma from '../../db';
 import { Role } from '@prisma/client';
 import { AppError } from '../../utils/AppError';

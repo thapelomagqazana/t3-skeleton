@@ -21,6 +21,7 @@ interface SignInPayload {
  */
 export const signUp = async (payload: SignUpPayload) => {
   const response = await axiosInstance.post('/auth/signup', payload);
+  console.log(response);
   return response.data;
 };
 

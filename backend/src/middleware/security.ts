@@ -25,6 +25,7 @@ export const applySecurityMiddleware = (app: Application) => {
   // ──────────────── CORS ────────────────
   // Allow requests from the frontend origin defined in .env
   const allowedOrigin = process.env.FRONTEND_URL || '*';
+  const maxLimit = process.env.NODE_ENV === 'development' ? 1000 : 100;
 
   app.use(
     cors({
@@ -38,7 +39,7 @@ export const applySecurityMiddleware = (app: Application) => {
   // Limits repeated requests to public APIs
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per window
+    max: maxLimit, // Limit each IP to number of requests per windowMs
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true, // Use `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
