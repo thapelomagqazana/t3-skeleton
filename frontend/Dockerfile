@@ -5,14 +5,14 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files and install all dependencies (including dev)
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install
 
-# Copy the rest of the application
+# Copy the rest of the frontend app
 COPY . .
 
-# Build the frontend (Vite outputs to /app/dist by default)
+# Build the Vite app
 RUN npm run build
 
 # --------------------------------------------
@@ -20,17 +20,17 @@ RUN npm run build
 # --------------------------------------------
 FROM nginx:stable-alpine
 
-# Remove default nginx website
+# Remove default nginx static files
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy built assets from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config (optional, create if needed)
+# Copy custom nginx config (optional)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80 for container
+# Expose HTTP port
 EXPOSE 80
 
-# Start Nginx
+# Start nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]
