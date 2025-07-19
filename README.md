@@ -1,30 +1,35 @@
-# 🧱 T3 Skeleton — Full Stack Starter Template
+# T3 Skeleton — Full Stack Starter Template
 
 A modern full-stack starter template using:
 
-- Node.js + Express + Prisma (Backend)
-- Vite + TypeScript + React (Frontend)
-- PostgreSQL (Database)
-- Docker Compose (Dev Environment)
-- JWT Auth Ready
+- **Node.js + Express + Prisma** (Backend)
+- **Vite + TypeScript + React** (Frontend)
+- **PostgreSQL** (Database)
+- **Docker Compose** (Dev Environment)
+- **JWT Auth** Ready
+
+---
 
 ## Project Structure
-```md
 
+```md
 t3-skeleton/
 │
 ├── frontend/        # React + Vite frontend
 ├── backend/         # Express + Prisma backend
 └── docker-compose.yml
+````
 
-```
+---
+
 ## Getting Started (Local Dev with Docker)
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/thapelomagqazana/t3-skeleton.git
 cd t3-skeleton
-````
+```
 
 ---
 
@@ -81,7 +86,7 @@ docker-compose exec backend npx prisma migrate dev --name init
 | ----------- | ------------------------------------------------------------ |
 | Frontend    | [http://localhost:8080](http://localhost:8080)               |
 | Backend API | [http://localhost:5000/api/v1](http://localhost:5000/api/v1) |
-| Database    | localhost:5434 (outside Docker)                              |
+| Database    | `localhost:5434` (outside Docker)                            |
 
 ---
 
@@ -112,38 +117,64 @@ npm run build    # Build production bundle
 
 ---
 
+## API Endpoints
+
+### Auth Routes
+
+| Method | Endpoint   | Description              | Auth Required |
+| ------ | ---------- | ------------------------ | ------------- |
+| POST   | `/api/v1/auth/signup`  | Register a new user      | ❌ No          |
+| POST   | `/api/v1/auth/signin`  | Sign in an existing user | ❌ No          |
+| POST   | `/api/v1/auth/signout` | Sign out a user          | ✅ Yes         |
+
+---
+
+### User Routes (Protected)
+
+| Method | Endpoint            | Description       | Auth Required |
+| ------ | ------------------- | ----------------- | ------------- |
+| GET    | `/api/v1/users`     | Get all users     | ✅ Yes         |
+| GET    | `/api/v1/users/:id` | Get user by ID    | ✅ Yes         |
+| PUT    | `/api/v1/users/:id` | Update user by ID | ✅ Yes         |
+| DELETE | `/api/v1/users/:id` | Delete user by ID | ✅ Yes         |
+
+> All protected routes use **JWT Bearer Auth** in the Authorization header.
+
+---
+
 ## Docker Overview
 
 * Uses **bind mounts** for live reload (frontend & backend)
 * Prisma and PostgreSQL preconfigured
-* Easily swappable for Railway/Fly.io deployment
+* Easily swappable for **Render**, **Fly.io**, or **Railway** deployment
 
 ---
 
 ## Notes
 
 * Ensure Docker is running
-* Avoid port conflicts (5000 for API, 5434 for DB, 8080 for frontend)
-* `.env` secrets should not be committed
+* Avoid port conflicts (5000 = API, 5434 = DB, 8080 = frontend)
+* `.env` secrets **must not** be committed
 
 ---
 
 ## Future Plans
 
-* Add CI/CD via GitHub Actions
+* CI/CD via GitHub Actions
 * Optional Redis for caching
-* Deploy-ready Dockerfiles for Fly.io / Render
+* Deploy-ready Dockerfiles for Fly.io / Render / Railway
 
 ---
 
 ## Author
 
-Built by [Thapelo Magqazana](www.linkedin.com/in/thapelo-magqazana-90632a174)
+Built by [Thapelo Magqazana](https://www.linkedin.com/in/thapelo-magqazana-90632a174)
 
 ---
 
 ## License
 
 MIT
+
 
 
